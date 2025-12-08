@@ -1,6 +1,7 @@
 import sys
 import time
 from collections import deque
+from openpyxl import Workbook
 from search_graph import bfs_state_graph
 from bidirection_search_graph import bfs_state_graph_bidirectional
 from bi3_search_graph import bfs3_state_graph_bidirectional
@@ -76,10 +77,20 @@ def compute_distance_matrix(n, adj):
     return dist
 
 if __name__ == "__main__":
-    folder = "testcases"  # folder with your .in files
+    folder = "testcases"
 
-    # list all files ending with .in
     files = sorted(f for f in os.listdir(folder) if f.endswith(".in"))
+
+    # Excel workbook
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Results"
+
+    # UPDATED HEADER ROW
+    ws.append([
+        "File", "n", "m", "T", "D",
+        "Expected Time (s)", "Actual Time (s)", "Difference (Actual - Expected)"
+    ])
 
     for filename in files:
         full_path = os.path.join(folder, filename)
@@ -94,19 +105,44 @@ if __name__ == "__main__":
         n, m, T, D, s_a, t_a, s_b, t_b, adj = instance
         dist = compute_distance_matrix(n, adj)
 
+        # Run your algorithm
         start_ns = time.perf_counter_ns()
         k, path_a, path_b = bfs5_state_graph_bidirectional(
             adj, dist, s_a, t_a, s_b, t_b, D, T
         )
         end_ns = time.perf_counter_ns()
 
-        # Print the output in assignment format, but with filename first
-        print("n =", n, "m =", m, "T =", T, "D =", D)
-        print("k =", k)
+        actual_time = (end_ns - start_ns) / 1e9
+        print("actual =", actual_time)
 
-        if k <= T:
-            print("path_a =", " ".join(map(str, path_a)))
-            print("path_b =", " ".join(map(str, path_b)))
+        # Read expected time from .out
+        out_file = os.path.join(folder, filename.replace(".in", ".out"))
 
-        print("elapsed_seconds =", (end_ns - start_ns) / 1e9)
-        print("==============================")
+        expected_time = None
+        if os.path.exists(out_file):
+            with open(out_file, "r") as f:
+                lines = f.readlines()
+                if lines:
+                    for line in reversed(lines):
+                        if line.strip():
+                            try:
+                                expected_time = float(line.strip())
+                            except ValueError:
+                                expected_time = None
+                            break
+
+        print("expected =", expected_time)
+
+        # WRITE ROW TO EXCEL
+        ws.append([
+            filename,
+            n, m, T, D,
+            expected_time,
+            actual_time,
+            None if expected_time is None else actual_time - expected_time
+        ])
+
+    # Save Excel file
+    output_excel = "results.xlsx"
+    wb.save(output_excel)
+    print("\nResults written to:", output_excel)
