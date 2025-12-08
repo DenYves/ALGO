@@ -76,7 +76,7 @@ def compute_distance_matrix(n, adj):
     return dist
 
 if __name__ == "__main__":
-    file = r"testcases/grid50-9.in"
+    file = r"testcases/grid50-1-randomized.in"
     n, m, T, D, s_a, t_a, s_b, t_b, adj = read_instance(filename=file)
 
     dist = compute_distance_matrix(n, adj)
