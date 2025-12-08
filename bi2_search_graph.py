@@ -1,5 +1,5 @@
 from collections import deque
-
+# goes from both sides with bfs but uses encode and decode
 def bfs2_state_graph_bidirectional(adj, dist, s_a, t_a, s_b, t_b, D, T):
     n = len(adj)
     N_states = n * n

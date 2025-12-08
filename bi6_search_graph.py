@@ -1,5 +1,6 @@
 from collections import deque
 
+# pruning before adding it into the queue
 def bfs6_state_graph_bidirectional(adj, dist, s_a, t_a, s_b, t_b, D, T):
     n = len(adj)
     N_states = n * n

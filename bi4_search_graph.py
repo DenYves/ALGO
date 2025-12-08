@@ -1,6 +1,6 @@
 from collections import deque
 
-
+# the fake program when it stopped at the first meeting point
 def bfs4_state_graph_bidirectional(adj, dist, s_a, t_a, s_b, t_b, D, T):
     n = len(adj)
     N_states = n * n

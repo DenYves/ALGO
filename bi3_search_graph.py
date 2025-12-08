@@ -1,5 +1,5 @@
 from collections import deque
-
+# like bfs 2 but without the encode and decode
 def bfs3_state_graph_bidirectional(adj, dist, s_a, t_a, s_b, t_b, D, T):
     n = len(adj)
     N_states = n * n
