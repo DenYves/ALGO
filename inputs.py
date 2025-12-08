@@ -76,27 +76,37 @@ def compute_distance_matrix(n, adj):
     return dist
 
 if __name__ == "__main__":
-    file = r"testcases/grid50-1-randomized.in"
-    n, m, T, D, s_a, t_a, s_b, t_b, adj = read_instance(filename=file)
+    folder = "testcases"  # folder with your .in files
 
-    dist = compute_distance_matrix(n, adj)
+    # list all files ending with .in
+    files = sorted(f for f in os.listdir(folder) if f.endswith(".in"))
 
-    # Example use: just print a small summary
-    print("n =", n, "m =", m, "T =", T, "D =", D)
+    for filename in files:
+        full_path = os.path.join(folder, filename)
 
-    start_ns = time.perf_counter_ns()
-    k, path_a, path_b = bfs5_state_graph_bidirectional(adj, dist, s_a, t_a, s_b, t_b, D, T)
-    end_ns = time.perf_counter_ns()
-    elapsed_ns = end_ns - start_ns
+        print(f"\n===== FILE: {filename} =====")
 
-    # Output format as in the assignment:
-    # - first line: k (or T+1 if no solution with k <= T)
-    print(k)
+        instance = read_instance(full_path)
+        if instance is None:
+            print("Skipping due to read error.")
+            continue
 
-    if k <= T:
-        # Print paths if a solution exists
-        print(" ".join(map(str, path_a)))
-        print(" ".join(map(str, path_b)))
+        n, m, T, D, s_a, t_a, s_b, t_b, adj = instance
+        dist = compute_distance_matrix(n, adj)
 
-    # Final line: number of seconds
-    print(elapsed_ns/10**9)
+        start_ns = time.perf_counter_ns()
+        k, path_a, path_b = bfs5_state_graph_bidirectional(
+            adj, dist, s_a, t_a, s_b, t_b, D, T
+        )
+        end_ns = time.perf_counter_ns()
+
+        # Print the output in assignment format, but with filename first
+        print("n =", n, "m =", m, "T =", T, "D =", D)
+        print("k =", k)
+
+        if k <= T:
+            print("path_a =", " ".join(map(str, path_a)))
+            print("path_b =", " ".join(map(str, path_b)))
+
+        print("elapsed_seconds =", (end_ns - start_ns) / 1e9)
+        print("==============================")
