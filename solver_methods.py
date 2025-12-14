@@ -65,11 +65,11 @@ def bfs_on_new_graph(n, adj, dist, s_a, t_a, s_b, t_b, D, T):
 
         # analyzing each of the two cases
         if player == 0:
-            h_real = max(dx, dy)
+            lb_real = max(dx, dy)
         else:
-            h_real = max(dx, dy - 1)
+            lb_real = max(dx, dy - 1)
 
-        if real_so_far + h_real > T:
+        if real_so_far + lb_real > T:
             continue
         # ------------------------------------------
 
