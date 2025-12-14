@@ -123,6 +123,23 @@ if __name__ == "__main__":
         running_time = (end_ns - start_ns) / 1e9
         print("Running time =", running_time)
 
+        # --- create an output file for the algorithm's result in the same folder ---
+        # It will have the following name structure : if input is "file.in" -> output is "alg_file.out"
+        stem, _ = os.path.splitext(filename)
+        alg_out_file = os.path.join(folder, f"alg_{stem}.out")
+
+        try:
+            with open(alg_out_file, "w") as g:
+                g.write(f"{k}\n")
+                a_line = " ".join(str(v) for v in path_a) if path_a else ""
+                b_line = " ".join(str(v) for v in path_b) if path_b else ""
+                g.write(f"{a_line}\n")
+                g.write(f"{b_line}\n")
+                g.write(f"{running_time:.6f} seconds\n")
+
+        except OSError as e:
+            print(f"Warning: could not write '{alg_out_file}': {e}", file=sys.stderr)
+
         # retrieving the example running time from .out file
         out_file = os.path.join(folder, filename.replace(".in", ".out"))
 
