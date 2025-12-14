@@ -1,6 +1,7 @@
 import sys
 import time
 import os
+import argparse
 from collections import deque
 from openpyxl import Workbook
 from solver_methods import bfs_on_new_graph
@@ -69,9 +70,24 @@ def compute_distance_matrix(n, adj):
 
 
 if __name__ == "__main__":
-    # the files that we want to run
-    folder = "testcases"
-    files = sorted(f for f in os.listdir(folder) if f.endswith("honey500.in"))
+
+    # getting the argument for the folder
+    parser = argparse.ArgumentParser(
+        description="Run the solver on all .in files in a folder and write results to an Excel file."
+    )
+    parser.add_argument(
+        "-f", "--folder", default="testcases",
+        help="Folder containing input .in files (and optional matching .out files). Default: testcases"
+    )
+    args = parser.parse_args()
+
+    folder = args.folder
+    if not os.path.isdir(folder):
+        print(f"Error: folder '{folder}' does not exist.", file=sys.stderr)
+        sys.exit(1)
+
+    # all the input files
+    files = sorted(f for f in os.listdir(folder) if f.endswith(".in"))
 
     # creating the workbook
     wb = Workbook()
