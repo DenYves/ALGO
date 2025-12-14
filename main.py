@@ -164,7 +164,7 @@ if __name__ == "__main__":
                 for raw in reversed(lines):
                     line = raw.strip()
                     if not line:
-                        continue  # skip empty trailing lines
+                        continue
                     first_token = line.split()[0]
                     number_str = first_token.replace(",", ".")  # "8,9" -> "8.9"
                     try:
