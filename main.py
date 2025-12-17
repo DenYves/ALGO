@@ -5,7 +5,7 @@ import argparse
 from collections import deque
 from openpyxl import Workbook
 from solver_methods import bfs_on_new_graph
-
+from initial_solver import bfs_bidirectional
 def read_instance(filename):
 
     try:
@@ -48,26 +48,61 @@ def read_instance(filename):
     return n, m, T, D, s_a, t_a, s_b, t_b, adj
 
 
-# converts the adjacency matrix into a distance matrix
-def compute_distance_matrix(n, adj):
+# converts the adjacency matrix into a distance matrix with capping at D
+def compute_distance_matrix1(n, adj, D, t_a, t_b):
 
+    dist = [[D + 1] * n for _ in range(n)]
+    targets = (t_a, t_b)
+
+    for s in range(n):
+        if s in targets:
+            # full BFS: exact distances, -1 for unreachable
+            row = [-1] * n
+            row[s] = 0
+            q = deque([s])
+            while q:
+                u = q.popleft()
+                du = row[u]
+                for v in adj[u]:
+                    if row[v] == -1:
+                        row[v] = du + 1
+                        q.append(v)
+            dist[s] = row
+        else:
+            # capped BFS: only up to D, D+1 means ">D or unreachable"
+            row = dist[s]
+            row[s] = 0
+            q = deque([s])
+            while q:
+                u = q.popleft()
+                du = row[u]
+                if du == D:
+                    continue  # don't expand beyond depth D
+                for v in adj[u]:
+                    if row[v] == D + 1:   # not reached within depth D yet
+                        row[v] = du + 1
+                        q.append(v)
+
+    return dist
+
+# converts the adjacency list into a distance matrix - basic version
+def compute_distance_matrix0(n, adj):
     dist = [[-1] * n for _ in range(n)]
 
     for s in range(n):
-        q = deque()
-        q.append(s)
+        q = deque([s])
         dist[s][s] = 0
 
         while q:
             u = q.popleft()
             d_u = dist[s][u]
+
             for v in adj[u]:
                 if dist[s][v] == -1:
                     dist[s][v] = d_u + 1
                     q.append(v)
 
     return dist
-
 
 if __name__ == "__main__":
 
@@ -114,8 +149,8 @@ if __name__ == "__main__":
 
         # run the algorithm
         start_ns = time.perf_counter_ns()
-
-        dist = compute_distance_matrix(n, adj)
+        #dist = compute_distance_matrix0(n, adj)
+        dist = compute_distance_matrix1(n, adj, D, t_a, t_b)
         k, path_a, path_b = bfs_on_new_graph( n, adj, dist, s_a, t_a, s_b, t_b, D, T )
 
         end_ns = time.perf_counter_ns()
@@ -185,6 +220,6 @@ if __name__ == "__main__":
         ])
 
     # writes an excel file with the results from each of the files in that folder
-    output_excel = "results_trash.xlsx"
+    output_excel = "results.xlsx"
     wb.save(output_excel)
     print("\nResults written to:", output_excel)

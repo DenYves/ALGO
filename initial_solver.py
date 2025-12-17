@@ -1,7 +1,6 @@
 from collections import deque
 
-def bfs5_state_graph_bidirectional(adj, dist, s_a, t_a, s_b, t_b, D, T):
-    n = len(adj)
+def bfs_bidirectional(n, adj, dist, s_a, t_a, s_b, t_b, D, T):
     N_states = n * n
 
     # encode (x, y) as single index
@@ -32,11 +31,11 @@ def bfs5_state_graph_bidirectional(adj, dist, s_a, t_a, s_b, t_b, D, T):
     dist_t[goal]  = 0
 
     best_meeting_state = -1
-    best_total = T + 1     # we only care about ≤ T
-    found_meeting = False  # have we seen *any* meeting so far?
+    best_total = T + 1
+    found_meeting = False  # have we seen any meeting point so far?
 
     while q_s or q_t:
-        # choose side: expand smaller frontier
+        # expand on the smaller side
         if not q_s:
             side = 1
         elif not q_t:
@@ -56,16 +55,16 @@ def bfs5_state_graph_bidirectional(adj, dist, s_a, t_a, s_b, t_b, D, T):
             x = cur // n
             y = cur % n
 
-            # heuristic lower bound from (x,y) to (t_a, t_b)
-            dx_ta = dist[x][t_a]
-            dy_tb = dist[y][t_b]
+            # lower bound from (x,y) to (t_a, t_b)
+            dx_ta = dist[t_a][x]
+            dy_tb = dist[t_b][y]
             if dx_ta == -1 or dy_tb == -1:
-                h = best_total   # cannot reach target; if we already have an upper bound, prune
+                lb = best_total
             else:
-                h = max(dx_ta, dy_tb)
+                lb = max(dx_ta, dy_tb)
 
-            # if even the best-case extension can't beat current best_total, skip
-            if d_cur + h >= best_total:
+
+            if d_cur + lb >= best_total:
                 continue
 
             # A moves, B moves
@@ -147,15 +146,15 @@ def bfs5_state_graph_bidirectional(adj, dist, s_a, t_a, s_b, t_b, D, T):
             x = cur // n
             y = cur % n
 
-            # heuristic lower bound from (x,y) to (s_a, s_b)
-            dx_sa = dist[x][s_a]
-            dy_sb = dist[y][s_b]
-            if dx_sa == -1 or dy_sb == -1:
-                h = best_total   # cannot reach start; if we have upper bound, prune
+            # lower bound from (x,y) to (t_a, t_b)
+            dx_ta = dist[t_a][x]
+            dy_tb = dist[t_b][y]
+            if dx_ta == -1 or dy_tb == -1:
+                lb = best_total
             else:
-                h = max(dx_sa, dy_sb)
+                lb = max(dx_ta, dy_tb)
 
-            if d_cur + h >= best_total:
+            if d_cur + lb >= best_total:
                 continue
 
             # A moves, B moves

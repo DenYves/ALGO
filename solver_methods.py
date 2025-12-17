@@ -12,7 +12,7 @@ def bfs_on_new_graph(n, adj, dist, s_a, t_a, s_b, t_b, D, T):
 
     # start and goal must be valid pairs (aka distance > D)
     d_start = dist[s_a][s_b]
-    if d_start != -1 and d_start <= D:
+    if d_start <= D:
         return T + 1, [], []
 
     d_goal = dist[t_a][t_b]
@@ -57,11 +57,8 @@ def bfs_on_new_graph(n, adj, dist, s_a, t_a, s_b, t_b, D, T):
         # ------ pruning if already unreachable ------
         real_so_far = d_cur // 2
 
-        dx = dist[x][t_a]
-        dy = dist[y][t_b]
-
-        if dx == -1 or dy == -1:
-            continue
+        dx = dist[t_a][x]
+        dy = dist[t_b][y]
 
         # analyzing each of the two cases
         if player == 0:
@@ -95,7 +92,7 @@ def bfs_on_new_graph(n, adj, dist, s_a, t_a, s_b, t_b, D, T):
 
                 # distance constraint
                 d_xy = dist[x][ny]
-                if d_xy != -1 and d_xy <= D:
+                if d_xy <= D:
                     continue
 
                 # encoding
@@ -110,7 +107,7 @@ def bfs_on_new_graph(n, adj, dist, s_a, t_a, s_b, t_b, D, T):
                 q.append(nxt)
 
     # if we never reached goal, or we exceeded T real steps, no solution
-    if dist_state[goal] == -1 or dist_state[goal] > 2 * T:
+    if dist_state[goal] == -1:
         return T + 1, [], []
 
     # real nr of steps
